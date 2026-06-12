@@ -19,3 +19,6 @@ jobs:
 
     - name: Build Solution
       run: msbuild SNOW2.0.slnx /p:Configuration=Debug /p:Platform=x64
+
+    - name: Run Operational Tests
+      run: .\x64\Debug\SNOW2.0.exe
