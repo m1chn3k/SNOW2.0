@@ -1,7 +1,9 @@
 #include "snow2.hpp"
 #include "snow2tab.h"
 
-Snow2::Snow2() : r1(0), r2(0), head(0) {}
+Snow2::Snow2() : r1(0), r2(0), head(0) {
+	for (int i = 0; i < 16; ++i) s[i] = 0;
+}
 
 void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv) {
 
@@ -15,7 +17,7 @@ void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_
 	uint32_t iv1 = (uint32_t)iv[8] | ((uint32_t)iv[9] << 8) | ((uint32_t)iv[10] << 16) | ((uint32_t)iv[11] << 24);
 	uint32_t iv0 = (uint32_t)iv[12] | ((uint32_t)iv[13] << 8) | ((uint32_t)iv[14] << 16) | ((uint32_t)iv[15] << 24);
 
-	/*s[15] = k3;   s[14] = k2;   s[13] = k1;   s[12] = k0;
+	s[15] = k3;   s[14] = k2;   s[13] = k1;   s[12] = k0;
 	s[11] = ~k3;  s[10] = ~k2;  s[9] = ~k1;  s[8] = ~k0;
 	s[7] = k3;   s[6] = k2;   s[5] = k1;   s[4] = k0;
 	s[3] = ~k3;  s[2] = ~k2;  s[1] = ~k1;  s[0] = ~k0;
@@ -33,9 +35,8 @@ void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_
 		uint32_t fsm_out = get_fsm_output();
 		clock_fsm(fsm_out);
 		clock_internal(true, fsm_out);
-	}
-} */
-
+} 
+};
 uint32_t Snow2::StreamNext() {
 	// TODO: Generate the next 32-bit word of the keystream based on the current state of the cipher
 	return 0;
