@@ -53,21 +53,41 @@ void Snow2::clock_internal(bool initialization_mode, uint32_t fsm_out) {
 	head = (head + 1) % 16;
 }
 void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv) {
-
-	uint32_t k3 = ((uint32_t)key[0] << 24) | ((uint32_t)key[1] << 16) | ((uint32_t)key[2] << 8) | (uint32_t)key[3];
-	uint32_t k2 = ((uint32_t)key[4] << 24) | ((uint32_t)key[5] << 16) | ((uint32_t)key[6] << 8) | (uint32_t)key[7];
-	uint32_t k1 = ((uint32_t)key[8] << 24) | ((uint32_t)key[9] << 16) | ((uint32_t)key[10] << 8) | (uint32_t)key[11];
-	uint32_t k0 = ((uint32_t)key[12] << 24) | ((uint32_t)key[13] << 16) | ((uint32_t)key[14] << 8) | (uint32_t)key[15];
+	if ((key.size() != 16 && key.size() != 32) || iv.size() != 16) {
+		throw std::invalid_argument("Error: Invalid input size. What's 1000 minus 7?");
+	}
 
 	uint32_t iv3 = (uint32_t)iv[12] | ((uint32_t)iv[13] << 8) | ((uint32_t)iv[14] << 16) | ((uint32_t)iv[15] << 24);
 	uint32_t iv2 = (uint32_t)iv[8] | ((uint32_t)iv[9] << 8) | ((uint32_t)iv[10] << 16) | ((uint32_t)iv[11] << 24);
 	uint32_t iv1 = (uint32_t)iv[4] | ((uint32_t)iv[5] << 8) | ((uint32_t)iv[6] << 16) | ((uint32_t)iv[7] << 24);
 	uint32_t iv0 = (uint32_t)iv[0] | ((uint32_t)iv[1] << 8) | ((uint32_t)iv[2] << 16) | ((uint32_t)iv[3] << 24);
 
-	s[15] = k3;   s[14] = k2;   s[13] = k1;   s[12] = k0;
-	s[11] = ~k3;  s[10] = ~k2;  s[9] = ~k1;  s[8] = ~k0;
-	s[7] = k3;   s[6] = k2;   s[5] = k1;   s[4] = k0;
-	s[3] = ~k3;  s[2] = ~k2;  s[1] = ~k1;  s[0] = ~k0;
+	if (key.size() == 16) {
+		uint32_t k3 = ((uint32_t)key[0] << 24) | ((uint32_t)key[1] << 16) | ((uint32_t)key[2] << 8) | (uint32_t)key[3];
+		uint32_t k2 = ((uint32_t)key[4] << 24) | ((uint32_t)key[5] << 16) | ((uint32_t)key[6] << 8) | (uint32_t)key[7];
+		uint32_t k1 = ((uint32_t)key[8] << 24) | ((uint32_t)key[9] << 16) | ((uint32_t)key[10] << 8) | (uint32_t)key[11];
+		uint32_t k0 = ((uint32_t)key[12] << 24) | ((uint32_t)key[13] << 16) | ((uint32_t)key[14] << 8) | (uint32_t)key[15];
+
+		s[15] = k3;   s[14] = k2;   s[13] = k1;   s[12] = k0;
+		s[11] = ~k3;  s[10] = ~k2;  s[9] = ~k1;  s[8] = ~k0;
+		s[7] = k3;   s[6] = k2;   s[5] = k1;   s[4] = k0;
+		s[3] = ~k3;  s[2] = ~k2;  s[1] = ~k1;  s[0] = ~k0;
+	}
+	else {
+		uint32_t k7 = ((uint32_t)key[0] << 24) | ((uint32_t)key[1] << 16) | ((uint32_t)key[2] << 8) | (uint32_t)key[3];
+		uint32_t k6 = ((uint32_t)key[4] << 24) | ((uint32_t)key[5] << 16) | ((uint32_t)key[6] << 8) | (uint32_t)key[7];
+		uint32_t k5 = ((uint32_t)key[8] << 24) | ((uint32_t)key[9] << 16) | ((uint32_t)key[10] << 8) | (uint32_t)key[11];
+		uint32_t k4 = ((uint32_t)key[12] << 24) | ((uint32_t)key[13] << 16) | ((uint32_t)key[14] << 8) | (uint32_t)key[15];
+		uint32_t k3 = ((uint32_t)key[16] << 24) | ((uint32_t)key[17] << 16) | ((uint32_t)key[18] << 8) | (uint32_t)key[19];
+		uint32_t k2 = ((uint32_t)key[20] << 24) | ((uint32_t)key[21] << 16) | ((uint32_t)key[22] << 8) | (uint32_t)key[23];
+		uint32_t k1 = ((uint32_t)key[24] << 24) | ((uint32_t)key[25] << 16) | ((uint32_t)key[26] << 8) | (uint32_t)key[27];
+		uint32_t k0 = ((uint32_t)key[28] << 24) | ((uint32_t)key[29] << 16) | ((uint32_t)key[30] << 8) | (uint32_t)key[31];
+
+		s[15] = k7;  s[14] = k6;  s[13] = k5;  s[12] = k4;
+		s[11] = k3;  s[10] = k2;  s[9] = k1;  s[8] = k0;
+		s[7] = ~k7; s[6] = ~k6; s[5] = ~k5; s[4] = ~k4;
+		s[3] = ~k3; s[2] = ~k2; s[1] = ~k1; s[0] = ~k0;
+	}
 
 	s[15] ^= iv0;
 	s[12] ^= iv1;
@@ -85,7 +105,6 @@ void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_
 		clock_fsm(fsm_out);
 		clock_internal(true, fsm_out);
 	}
-
 
 	PrintState("AFTER 32 CLOCKS (READY FOR STREAM)");
 }
