@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <cstdint>
+#include <string>
 
 class Snow2 {
 public:
@@ -8,7 +9,7 @@ public:
     void InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv);
     uint32_t StreamNext();
     void ProcessBytes(const std::vector<uint8_t>& input, std::vector<uint8_t>& output);
-
+    void PrintState(const std::string& label);
 private:
     uint32_t s[16];
     uint32_t r1, r2;
