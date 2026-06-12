@@ -91,8 +91,15 @@ void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_
 }
 
 uint32_t Snow2::StreamNext() {
-	// TODO: Generate the next 32-bit word of the keystream based on the current state of the cipher
-	return 0;
+	uint32_t old_s0 = s[head];
+	uint32_t old_s1 = s[(head + 1) % 16];
+
+	clock_internal(false, 0);
+
+	uint32_t fsm_out = get_fsm_output();
+	clock_fsm(fsm_out);
+
+	return (r1 + old_s0) ^ r2 ^ old_s1;
 }
 
 void Snow2::ProcessBytes(const std::vector<uint8_t>& input, std::vector<uint8_t>& output) {
