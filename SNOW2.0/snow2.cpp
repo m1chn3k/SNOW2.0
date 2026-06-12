@@ -103,7 +103,38 @@ uint32_t Snow2::StreamNext() {
 }
 
 void Snow2::ProcessBytes(const std::vector<uint8_t>& input, std::vector<uint8_t>& output) {
-	// TODO: generate the keystream and XOR it with the input to produce the output
+	output.resize(input.size());
+	size_t i = 0;
+
+	while (i + 4 <= input.size()) {
+
+		uint32_t keystream_word = StreamNext();
+
+		uint32_t input_word = (uint32_t)input[i] |
+			((uint32_t)input[i + 1] << 8) |
+			((uint32_t)input[i + 2] << 16) |
+			((uint32_t)input[i + 3] << 24);
+
+		uint32_t output_word = input_word ^ keystream_word;
+
+		output[i] = output_word & 0xFF;
+		output[i + 1] = (output_word >> 8) & 0xFF;
+		output[i + 2] = (output_word >> 16) & 0xFF;
+		output[i + 3] = (output_word >> 24) & 0xFF;
+
+		i += 4;
+	}
+
+	if (i < input.size()) {
+		uint32_t keystream_word = StreamNext();
+		int byte_shift = 0;
+		while (i < input.size()) {
+			uint8_t keystream_byte = (keystream_word >> (byte_shift * 8)) & 0xFF;
+			output[i] = input[i] ^ keystream_byte;
+			i++;
+			byte_shift++;
+		}
+	}
 }
 
 void Snow2::PrintState(const std::string& label) {
