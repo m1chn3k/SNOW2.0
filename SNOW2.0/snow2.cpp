@@ -5,6 +5,18 @@ Snow2::Snow2() : r1(0), r2(0), head(0) {
 	for (int i = 0; i < 16; ++i) s[i] = 0;
 }
 
+uint32_t Snow2::a_mul(uint32_t w) {
+	return (w << 8) ^ Snow2Constants::snow_alpha_mul[w >> 24];
+}
+
+uint32_t Snow2::ainv_mul(uint32_t w) {
+	return (w >> 8) ^ Snow2Constants::snow_alphainv_mul[w & 0xFF];
+}
+
+uint32_t Snow2::get_fsm_output() {
+	uint32_t s15 = s[(head + 15) % 16];
+	return (r1 + s15) ^ r2;
+}
 void Snow2::InitCipher(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv) {
 
 	uint32_t k3 = ((uint32_t)key[0] << 24) | ((uint32_t)key[1] << 16) | ((uint32_t)key[2] << 8) | (uint32_t)key[3];
